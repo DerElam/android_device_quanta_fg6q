@@ -1,0 +1,131 @@
+
+project build/
+diff --git a/core/definitions.mk b/core/definitions.mk
+index a2d22c74..e37995a4 100644
+--- a/core/definitions.mk
++++ b/core/definitions.mk
+@@ -791,13 +791,13 @@ endef
+ define transform-y-to-cpp
+ @mkdir -p $(dir $@)
+ @echo "Yacc: $(PRIVATE_MODULE) <= $<"
+-$(YACC) $(PRIVATE_YACCFLAGS) -o $@ $<
+-touch $(@:$1=$(YACC_HEADER_SUFFIX))
+-echo '#ifndef '$(@F:$1=_h) > $(@:$1=.h)
+-echo '#define '$(@F:$1=_h) >> $(@:$1=.h)
+-cat $(@:$1=$(YACC_HEADER_SUFFIX)) >> $(@:$1=.h)
+-echo '#endif' >> $(@:$1=.h)
+-rm -f $(@:$1=$(YACC_HEADER_SUFFIX))
++$(YACC) $(PRIVATE_YACCFLAGS) --defines=$(basename $@).h -o $@ $<
++#touch $(@:$1=$(YACC_HEADER_SUFFIX))
++#echo '#ifndef '$(@F:$1=_h) > $(@:$1=.h)
++#echo '#define '$(@F:$1=_h) >> $(@:$1=.h)
++#cat $(@:$1=$(YACC_HEADER_SUFFIX)) >> $(@:$1=.h)
++#echo '#endif' >> $(@:$1=.h)
++#rm -f $(@:$1=$(YACC_HEADER_SUFFIX))
+ endef
+ 
+ ###########################################################
+
+project cts/
+diff --git a/suite/audio_quality/lib/src/ClientSocket.cpp b/suite/audio_quality/lib/src/ClientSocket.cpp
+index 1fa9090d6fb..319f50e96ce 100644
+--- a/suite/audio_quality/lib/src/ClientSocket.cpp
++++ b/suite/audio_quality/lib/src/ClientSocket.cpp
+@@ -21,6 +21,14 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ 
++/* HACK, doesn't work but makes the whole lineageos project compile */
++extern "C" {
++    int fcntl64 (int __fd, int __cmd, ...) 
++    {
++	return fcntl(__fd, __cmd);
++    }
++}
++
+ #include "Log.h"
+ 
+ #include "ClientSocket.h"
+
+project frameworks/base/
+diff --git a/core/java/android/app/admin/DeviceAdminInfo.java b/core/java/android/app/admin/DeviceAdminInfo.java
+index 3ea4c7f2d0..54575c7298 100644
+--- a/core/java/android/app/admin/DeviceAdminInfo.java
++++ b/core/java/android/app/admin/DeviceAdminInfo.java
+@@ -414,8 +414,7 @@ public final class DeviceAdminInfo implements Parcelable {
+      * {@link #USES_POLICY_RESET_PASSWORD}, {@link #USES_POLICY_FORCE_LOCK},
+      * {@link #USES_POLICY_WIPE_DATA},
+      * {@link #USES_POLICY_EXPIRE_PASSWORD}, {@link #USES_ENCRYPTED_STORAGE},
+-     * {@link #USES_POLICY_DISABLE_CAMERA}, {@link #USES_POLICY_ENFORCE_SELINUX},
+-     * {@link #USES_POLICY_ENFORCE_MMAC}.
++     * {@link #USES_POLICY_DISABLE_CAMERA}
+      */
+     public boolean usesPolicy(int policyIdent) {
+         return (mUsesPolicies & (1<<policyIdent)) != 0;
+diff --git a/core/java/com/android/internal/widget/LockPatternUtils.java b/core/java/com/android/internal/widget/LockPatternUtils.java
+index 93a84e53af..169c86edc8 100644
+--- a/core/java/com/android/internal/widget/LockPatternUtils.java
++++ b/core/java/com/android/internal/widget/LockPatternUtils.java
+@@ -1333,7 +1333,7 @@ public class LockPatternUtils {
+     }
+ 
+     /**
+-     * @deprecated
++     * @deprecated no reason given
+      * @param button
+      * @param phoneState
+      * @param shown
+diff --git a/telephony/java/android/telephony/NeighboringCellInfo.java b/telephony/java/android/telephony/NeighboringCellInfo.java
+index 5371573095..8180c81c36 100644
+--- a/telephony/java/android/telephony/NeighboringCellInfo.java
++++ b/telephony/java/android/telephony/NeighboringCellInfo.java
+@@ -109,8 +109,7 @@ public class NeighboringCellInfo implements Parcelable
+      * {@link TelephonyManager#NETWORK_TYPE_HSDPA TelephonyManager.NETWORK_TYPE_HSDPA},
+      * {@link TelephonyManager#NETWORK_TYPE_HSUPA TelephonyManager.NETWORK_TYPE_HSUPA},
+      * {@link TelephonyManager#NETWORK_TYPE_HSPA TelephonyManager.NETWORK_TYPE_HSPA},
+-     * {@link TelephonyManager#NETWORK_TYPE_HSPAP TelephonyManager.NETWORK_TYPE_HSPAP},
+-     * and {@link TelephonyManager#NETWORK_TYPE_DCHSPAP TelephonyManager.NETWORK_TYPE_DCHSPAP}.
++     * {@link TelephonyManager#NETWORK_TYPE_HSPAP TelephonyManager.NETWORK_TYPE_HSPAP}
+      */
+     public NeighboringCellInfo(int rssi, String location, int radioType) {
+         // set default value
+@@ -223,8 +222,7 @@ public class NeighboringCellInfo implements Parcelable
+      * {@link TelephonyManager#NETWORK_TYPE_HSDPA TelephonyManager.NETWORK_TYPE_HSDPA},
+      * {@link TelephonyManager#NETWORK_TYPE_HSUPA TelephonyManager.NETWORK_TYPE_HSUPA},
+      * {@link TelephonyManager#NETWORK_TYPE_HSPA TelephonyManager.NETWORK_TYPE_HSPA},
+-     * {@link TelephonyManager#NETWORK_TYPE_HSPAP TelephonyManager.NETWORK_TYPE_HSPAP},
+-     * or {@link TelephonyManager#NETWORK_TYPE_DCHSPAP TelephonyManager.NETWORK_TYPE_DCHSPAP}
++     * {@link TelephonyManager#NETWORK_TYPE_HSPAP TelephonyManager.NETWORK_TYPE_HSPAP}
+      * means that Neighboring Cell information is stored for UMTS network, in
+      * which {@link NeighboringCellInfo#getPsc NeighboringCellInfo.getPsc}
+      * should be called to access location.
+
+project prebuilts/ndk/
+diff --git a/8/platforms/android-9/arch-x86/usr/include/sys/linux-unistd.h b/8/platforms/android-9/arch-x86/usr/include/sys/linux-unistd.h
+index 23853dac1..b698d0572 100644
+--- a/8/platforms/android-9/arch-x86/usr/include/sys/linux-unistd.h
++++ b/8/platforms/android-9/arch-x86/usr/include/sys/linux-unistd.h
+@@ -88,7 +88,7 @@ int              fsync (int);
+ int              fdatasync (int);
+ int              fchown (int, uid_t, gid_t);
+ void             sync (void);
+-int              __fcntl64 (int, int, void *);
++  /* int              __fcntl64 (int, int, void *); */
+ int              __fstatfs64 (int, size_t, struct statfs *);
+ ssize_t          sendfile (int out_fd, int in_fd, off_t *offset, size_t count);
+ int              fstatat (int dirfd, const char *path, struct stat *buf, int flags);
+
+project vendor/cm/
+diff --git a/get-prebuilts b/get-prebuilts
+index 1d2b6df..27e1a0d 100755
+--- a/get-prebuilts
++++ b/get-prebuilts
+@@ -4,6 +4,7 @@ BASEDIR=`dirname $0`
+ mkdir -p $BASEDIR/proprietary
+ 
+ # Get Android Terminal Emulator (we use a prebuilt so it can update from the Market)
+-curl -L -o $BASEDIR/proprietary/Term.apk -O -L http://jackpal.github.com/Android-Terminal-Emulator/downloads/Term.apk
++# curl -L -o $BASEDIR/proprietary/Term.apk -O -L http://jackpal.github.com/Android-Terminal-Emulator/downloads/Term.apk
++curl -L -o $BASEDIR/proprietary/Term.apk -O -L https://jackpal.github.io/Android-Terminal-Emulator/downloads/Term-1.0.65.apk
+ unzip -o -d $BASEDIR/proprietary $BASEDIR/proprietary/Term.apk lib/*
+ 

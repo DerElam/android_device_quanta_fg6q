@@ -1,10 +1,17 @@
+# fstab for cwm recovery
 # mount point	fstype    device    	[device2]
 
-/boot       mtd         boot
-/cache      yaffs2      cache
-/data       yaffs2      userdata
-/misc       mtd         misc
-/recovery   mtd         recovery
-/sdcard     vfat        /dev/block/mmcblk0p1        /dev/block/mmcblk0
-/system     yaffs2      system
-/sd-ext     ext4        /dev/block/mmcblk0p2
+/system      ext4   /dev/block/platform/sdhci-tegra.3/by-name/APP
+/cache       ext4   /dev/block/platform/sdhci-tegra.3/by-name/CAC
+/dtb         emmc   /dev/block/platform/sdhci-tegra.3/by-name/DTB
+/boot        emmc   /dev/block/platform/sdhci-tegra.3/by-name/LNX
+/metadata    emmc   /dev/block/platform/sdhci-tegra.3/by-name/MDA
+/mfg         ext4   /dev/block/platform/sdhci-tegra.3/by-name/MFG
+/misc        emmc   /dev/block/platform/sdhci-tegra.3/by-name/MSC
+/recovery    emmc   /dev/block/platform/sdhci-tegra.3/by-name/SOS
+/data        ext4   /dev/block/platform/sdhci-tegra.3/by-name/UDA
+/staging     emmc   /dev/block/platform/sdhci-tegra.3/by-name/USP
+/sdcard      vfat   /dev/block/platform/sdhci-tegra.0/by-num/p1
+#/external_sd auto   /dev/block/platform/sdhci-tegra.2/by-num/1
+#/sdcard      auto   /dev/block/platform/sdhci-tegra.2/by-num/1
+#/sd-ext      auto   /dev/block/platform/sdhci-tegra.2/by-num/2

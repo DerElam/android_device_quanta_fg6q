@@ -2,10 +2,10 @@
 $(call inherit-product, vendor/cm/config/gsm.mk)
 
 # Release name
-PRODUCT_RELEASE_NAME := fg6q
+PRODUCT_RELEASE_NAME := test
 
 # Inherit some common CM stuff.
-$(call inherit-product, vendor/cm/config/common_full_phone.mk)
+$(call inherit-product, vendor/cm/config/common_full_tablet_wifionly.mk)
 
 # Inherit device configuration
 $(call inherit-product, device/quanta/fg6q/device_fg6q.mk)
@@ -16,3 +16,4 @@ PRODUCT_NAME := cm_fg6q
 PRODUCT_BRAND := quanta
 PRODUCT_MODEL := fg6q
 PRODUCT_MANUFACTURER := quanta
+
