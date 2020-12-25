@@ -1,4 +1,6 @@
 import init.nv_dev_board.usb.rc
+import init.tf.rc
+import init.model_specific.rc
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug
@@ -340,13 +342,6 @@ service hostapd_bin  /system/bin/hostapd -dd /data/misc/wifi/hostapd.conf
     disabled
     oneshot
 
-# bugreport is triggered by the VOLUME-DOWN and VOLUME-UP keys
-service bugreport /system/bin/dumpstate -d -v -o /data/storage/bugreports/bugreport
-    class main
-    disabled
-    oneshot
-    keycodes 115 114
-
 # btmacwriter - to create unique BD address
 service btmacwriter /system/bin/btmacwriter
     class main
@@ -372,9 +367,6 @@ service gps-test-daemon /system/bin/glgps_nvidiaTegra2android -c /system/etc/gps
 on property:init.svc.hciattach=stopped
     write /sys/devices/platform/reg-userspace-consumer.1/state disabled
 
-# Prepare TF service
-import init.tf.rc
-
 # Enable NvCpuD, and set it to never poll config again
 on boot
     setprop nvcpud.enabled true
@@ -391,23 +383,6 @@ service powerservice /system/bin/powerservice
     class main
     user system
     group system
-
-#Modem
-#service ril-daemon /system/bin/rild -l libhuawei-ril.so
-#    class main
-#    socket rild stream 660 root radio
-#    socket rild-debug stream 660 radio system
-#    user root
-#    group radio cache inet misc audio sdcard_rw
-
-# create filesystems if necessary
-service setup_fs /system/bin/setup_fs \
-        /dev/block/platform/sdhci-tegra.3/by-name/UDA \
-        /dev/block/platform/sdhci-tegra.3/by-name/CAC
-    class core
-    user root
-    group root
-    oneshot
 
 # unified scaling setup
 service ussr_setup /system/bin/ussr_setup.sh
@@ -428,23 +403,12 @@ service usdwatchdog /system/bin/usdwatchdog --wait 30
     group system
     class main
 
-# start pbc daemon
-service pbc /system/bin/pbc
-    class main
-    user root
-    group root
-
-# Second boot and onwards
-on property:ril.testmode=1
-    stop ril-daemon
-    start ril-daemon-test
-
-on property:ril.testmode=0
-    stop ril-daemon-test
-    start ril-daemon
-
-service p2p_supplicant /system/bin/wpa_supplicant \
-    -Dnl80211 -iwlan0 -puse_p2p_group_interface=1 -e/data/misc/wifi/entropy.bin -c/data/misc/wifi/wpa_supplicant.conf \
+service wpa_suppl_nl /system/bin/wpa_supplicant \
+	-iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+	-N \
+	-ip2p0 	-Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
+	-e/data/misc/wifi/entropy.bin \
+	-puse_p2p_group_interface=1
 #   we will start as root and wpa_supplicant will switch to user wifi
 #   after setting up the capabilities required for WEXT
 #   user wifi
@@ -454,9 +418,12 @@ service p2p_supplicant /system/bin/wpa_supplicant \
     disabled
     oneshot
 
-service wpa_suppl_nl /system/bin/wpa_supplicant \
-    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -N \
-    -ip2p0 -Dnl80211 -c /data/misc/wifi/p2p_supplicant.conf -e/data/misc/wifi/entropy.bin -puse_p2p_group_interface=1
+service p2p_supplicant /system/bin/wpa_supplicant \
+	-iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+	-N \
+	-ip2p0 	-Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
+	-e/data/misc/wifi/entropy.bin \
+	-puse_p2p_group_interface=1
 #   we will start as root and wpa_supplicant will switch to user wifi
 #   after setting up the capabilities required for WEXT
 #   user wifi
@@ -473,18 +440,12 @@ service wifiloader /system/bin/wifi_loader.sh
     group root
     oneshot
 
-service supl20clientd /system/bin/supl20clientd
-    class main
-
 service bdt /system/bin/logwrapper /system/bin/bdt -p
     class main
     user root
     group root
     disabled
     oneshot
-
-# Customers should remove this line
-# import init.qvs.rc
 
 on property:wifi.test_mode=1
     rm /data/misc/wifi/firmware/fw_bcmdhd.bin
@@ -494,44 +455,9 @@ on property:wifi.test_mode=0
     rm /data/misc/wifi/firmware/fw_bcmdhd.bin
     symlink /data/misc/wifi/firmware/fw_bcmdhd_non_mfg.bin /data/misc/wifi/firmware/fw_bcmdhd.bin
 
-# Disabled the annoying bootaudio
-#
-# service sv_bootaudio /system/bin/bootaudio
-#     user system
-#     disabled
-#     oneshot
-#
-# on property:init.svc.bootanim=running
-#     start sv_bootaudio
-#     # start touch_fw_update
-
-# PP3N DNP
-import init.dnp.rc
-
 # for checking eks.dat is wrapped with correct SBK, default value
 setprop eks.eksstatus 0
 
 # for touch enable
 on property:sys.boot_completed=1
     write /sys/bus/i2c/devices/1-0038/enable 1
-
-# for touch upgrade
-#service touch_fw_update /system/bin/touch_fw_upgrade
-#    user root
-#    oneshot
-
-# various model/sku specific init.rc
-import init.model_specific.rc
-
-#+++ [QuantaMTP:Eria] Start
-on property:persist.sys.quanta-mtp.enable=1
-    start mtpserver
-
-on property:persist.sys.quanta-mtp.enable=0
-    stop mtpserver
-
-service mtpserver /system/bin/mtpserver
-    class main
-    user root
-    disabled
-#+++ [QuantaMTP:Eria] Stop

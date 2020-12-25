@@ -1,0 +1,21 @@
+# check touch-panel FW version
+service checkTpVersion /system/bin/sh /updateTpFw.sh
+    user root
+    group root
+    oneshot
+    disabled # this is not necessary since it has no class specified
+
+on boot
+    start checkTpVersion
+
+# touch panel FW update and calibration
+service updateTpFw /system/bin/sh /updateTpFw.sh update
+    user root
+    group root
+    oneshot
+    disabled # this is not necessary since it has no class specified
+
+# start touch-panel FW update process
+on property:persist.sys.touch_panel.fw=runUpdate
+    start updateTpFw
+

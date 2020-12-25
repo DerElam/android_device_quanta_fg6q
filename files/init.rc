@@ -31,7 +31,7 @@ on early-init
 
 on init
    sysclktz 0
-   loglevel 3
+   loglevel 7
 
    # setup the global environment
     export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
@@ -269,8 +269,6 @@ on post-fs-data
     # Set indication (checked by vold) that we have finished this action
     #setprop vold.post_fs_data_done 1
 
-    # -> see import /init.cm.rc at the top of this file
-
 on boot
     # interactive governor
     chown system system /sys/devices/system/cpu/cpufreq/interactive/timer_rate
@@ -497,15 +495,6 @@ service netd /system/bin/netd
 service debuggerd /system/bin/debuggerd
     class main
 
-# This was commented/disabled in QV1030
-#
-# service ril-daemon /system/bin/rild
-#     class main
-#     socket rild stream 660 root radio
-#     socket rild-debug stream 660 radio system
-#     user root
-#     group radio cache inet misc audio sdcard_r sdcard_rw qcom_oncrpc qcom_diag log
-
 service surfaceflinger /system/bin/surfaceflinger
     class main
     user system
@@ -541,11 +530,6 @@ service bootanim /system/bin/bootanimation
 service installd /system/bin/installd
     class main
     socket installd stream 600 system system
-
-# This service was defined in QV1030
-service flash_recovery /system/etc/install-recovery.sh
-    class main
-    oneshot
 
 service racoon /system/bin/racoon
     class main

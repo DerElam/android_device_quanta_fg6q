@@ -19,3 +19,9 @@ python3 ./extract-files.py \
 	../proprietary-files.txt \
 	~/Downloads/Gigaset_QV1030/archive/Update.zip \
 	../../../../vendor/quanta/fg6q/
+
+echo "Don't forget to:"
+echo "    . build/envsetup.sh"
+echo "    lunch"
+echo "    mka"
+echo "    make bacon"

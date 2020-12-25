@@ -1,50 +1,43 @@
-$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
-
 # The gps config appropriate for this device
-$(call inherit-product, device/common/gps/gps_us_supl.mk)
-
-$(call inherit-product-if-exists, vendor/quanta/fg6q/fg6q-vendor.mk)
+$(call inherit-product, device/common/gps/gps_eu_supl.mk)
 
 # Provides overrides to configure Dalvik heap for standard tablet device
 $(call inherit-product, frameworks/native/build/tablet-10in-xhdpi-2048-dalvik-heap.mk)
 
+# Provides a number of basic applications
+$(call inherit-product, build/target/product/full_base.mk)
+
+$(call inherit-product-if-exists, vendor/quanta/fg6q/fg6q-vendor.mk)
+
 DEVICE_PACKAGE_OVERLAYS += device/quanta/fg6q/overlay
 
-# Use prebuilt stock kernel
-LOCAL_PATH := vendor/quanta/fg6q
-ifeq ($(TARGET_PREBUILT_KERNEL),)
-	LOCAL_KERNEL := $(LOCAL_PATH)/kernel
-else
-	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-endif
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_KERNEL):kernel
-
-# Provides a number of basic applications
-$(call inherit-product, build/target/product/full.mk)
-
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
-PRODUCT_NAME := full_fg6q
+PRODUCT_NAME   := full_fg6q
 PRODUCT_DEVICE := fg6q
 
-PRODUCT_CHARACTERISTICS := tablet
-PRODUCT_AAPT_CONFIG := xlarge xhdpi hdpi mdpi
+PRODUCT_CHARACTERISTICS  := tablet
+PRODUCT_AAPT_CONFIG      := xlarge xhdpi hdpi mdpi
 PRODUCT_AAPT_PREF_CONFIG := xhdpi
 
-## There are some symbols missing in the provided libinvensense_hal package.
-## For now we use the proprietary libinvensense_hal.so and libmlite.so
+## There are some symbols missing in the provided libinvensense_hal
+## package.  For now we don't add it to the package list and use the
+## proprietary libinvensense_hal.so and libmlite.so instead.
+
+PRODUCT_PACKAGES += \
+    charger \
+    charger_res_images \
+    libwpa_client \
+    wpa_supplicant \
+    audio.r_submix.default \
 
 # Some of these were taken from the stock firmware.
 PRODUCT_PROPERTY_OVERRIDES += \
-    persist.service.adb.enable=1 \
-    persist.service.debuggable=1 \
-    persist.sys.usb.config=mtp,adb \
     persist.sys.language=de \
     persist.sys.country=DE \
     persist.sys.timezone=Europe/Amsterdam \
     ro.sf.lcd_density=320 \
     wifi.interface=wlan0 \
+    wifi.direct.interface=p2p0 \
     ap.interface=wlan1 \
     ro.opengles.version=131072 \
     persist.tegra.nvmmlite=1 \
@@ -62,25 +55,4 @@ PRODUCT_PROPERTY_OVERRIDES += \
     media.aac_51_output_enabled=true \
     drm.service.enabled=true \
     dalvik.vm.dexopt-flags=m=y \
-    tf.enable=y \
-    ro.ril.wake_lock_timeout=200000 \
     persist.security.provision=7fffffffffffffff \
-    persist.tegra.compositor=glcomposer \
-
-# These were set in the stock firmware.
-# Either they are not needed or I have no idea what they do.
-UNUSED_PRODUCT_PROPERTY_OVERRIDES += \
-    debug.nfc.fw_download=false \
-    debug.nfc.se=false \
-    debug.hwui.render_dirty_regions=false \
-    ro.config.notification_sound=OnTheHunt.ogg \
-    ro.config.alarm_alert=Alarm_Classic.ogg \
-    net.bt.name=Android \
-    dalvik.vm.stack-trace-file=/data/anr/traces.txt \
-    ro.carrier=unknown \
-    ro.config.display.option.never=0 \
-    ro.com.google.gmsversion=4.2_r3 \
-    ro.com.google.clientidbase=android-quanta \
-    ro.setupwizard.mode=OPTIONAL \
-    ro.com.quanta.media.am3d=true \
-

@@ -73,13 +73,6 @@ if __name__ == '__main__':
             print('Unpacking bootimage')
             unpack_bootimage(f'{temp_dir}/boot.img')
 
-            # Copy the kernel to destination dir
-
-            src_path = f'{temp_dir}/zImage'
-            dst_path = f'{destination_dir}/kernel'
-            shutil.copyfile(src_path, dst_path)
-            print(f'Extracted kernel to {dst_path}')
-
             # Copy files from temp dir to destination dir
 
             os.makedirs(destination_dir, exist_ok=True)
