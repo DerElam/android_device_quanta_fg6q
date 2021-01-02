@@ -25,6 +25,8 @@ on init
     mkdir /mnt/usbdrive 0666 system system
     symlink /mnt/usbdrive /usbdrive
 
+    mkdir /mfg
+
 on fs
     setprop ro.crypto.tmpfs_options size=128m,mode=0771,uid=1000,gid=1000
     setprop ro.crypto.umount_sd false
@@ -383,6 +385,7 @@ service powerservice /system/bin/powerservice
     class main
     user system
     group system
+    disabled
 
 # unified scaling setup
 service ussr_setup /system/bin/ussr_setup.sh
@@ -461,3 +464,12 @@ setprop eks.eksstatus 0
 # for touch enable
 on property:sys.boot_completed=1
     write /sys/bus/i2c/devices/1-0038/enable 1
+
+on charger
+    write /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/enable 1
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor conservative
+    write /sys/class/input/input0/enabled 1
+    write /sys/class/input/input0/enabled 0
+
+service charger /charger
+    class charger

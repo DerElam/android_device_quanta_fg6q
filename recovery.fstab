@@ -1,17 +1,16 @@
-# fstab for cwm recovery
-# mount point	fstype    device    	[device2]
+# From /root/fstab.macallan
+/dev/block/platform/sdhci-tegra.3/by-name/APP  /system    ext4  ro                                                              wait
+/dev/block/platform/sdhci-tegra.3/by-name/CAC  /cache     ext4  noatime,nosuid,nodev,data=writeback,nodelalloc,errors=panic     wait
+/dev/block/platform/sdhci-tegra.3/by-name/DTB  /dtb       emmc  defaults                                                        defaults
+/dev/block/platform/sdhci-tegra.3/by-name/LNX  /boot      emmc  defaults                                                        defaults
+/dev/block/platform/sdhci-tegra.3/by-name/MDA  /metadata  emmc  defaults                                                        defaults
+/dev/block/platform/sdhci-tegra.3/by-name/MFG  /mfg       ext4  ro                                                              wait
+/dev/block/platform/sdhci-tegra.3/by-name/MSC  /misc      emmc  defaults                                                        defaults
+/dev/block/platform/sdhci-tegra.3/by-name/SOS  /recovery  emmc  defaults                                                        defaults
+/dev/block/platform/sdhci-tegra.3/by-name/UDA  /data      ext4  noatime,nosuid,nodev,data=ordered,noauto_da_alloc,errors=panic  wait,encryptable=/dev/block/platform/sdhci-tegra.3/by-name/MDA
+/dev/block/platform/sdhci-tegra.3/by-name/USP  /staging   emmc  defaults                                                        defaults
 
-/system      ext4   /dev/block/platform/sdhci-tegra.3/by-name/APP
-/cache       ext4   /dev/block/platform/sdhci-tegra.3/by-name/CAC
-/dtb         emmc   /dev/block/platform/sdhci-tegra.3/by-name/DTB
-/boot        emmc   /dev/block/platform/sdhci-tegra.3/by-name/LNX
-/metadata    emmc   /dev/block/platform/sdhci-tegra.3/by-name/MDA
-/mfg         ext4   /dev/block/platform/sdhci-tegra.3/by-name/MFG
-/misc        emmc   /dev/block/platform/sdhci-tegra.3/by-name/MSC
-/recovery    emmc   /dev/block/platform/sdhci-tegra.3/by-name/SOS
-/data        ext4   /dev/block/platform/sdhci-tegra.3/by-name/UDA
-/staging     emmc   /dev/block/platform/sdhci-tegra.3/by-name/USP
-/sdcard      auto   /dev/block/platform/sdhci-tegra.2/by-num/p1
-/usbdrive    vfat   /dev/block/platform/tegra-ehci.0/by-num/p1
-#/external_sd auto   /dev/block/platform/sdhci-tegra.2/by-num/1
-#/sd-ext      auto   /dev/block/platform/sdhci-tegra.2/by-num/2
+# From /system/etc/vold.fstab
+/devices/platform/sdhci-tegra.2/mmc_host/mmc1  auto       auto  defaults                                                        voldmanaged=sdcard1:auto
+/devices/platform/tegra-ehci.0                 auto       auto  defaults                                                        voldmanaged=usbdrive:auto
+

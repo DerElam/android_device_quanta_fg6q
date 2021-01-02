@@ -6,6 +6,7 @@ TARGET_NO_BOOTLOADER         := true
 TARGET_BOARD_PLATFORM        := tegra
 TARGET_CPU_ABI               := armeabi-v7a
 TARGET_CPU_ABI2              := armeabi
+TARGET_CPU_VARIANT           := cortex-a15
 TARGET_ARCH_VARIANT          := armv7-a-neon
 ARCH_ARM_HAVE_TLS_REGISTER   := true
 TARGET_BOOTLOADER_BOARD_NAME := macallan
@@ -14,7 +15,7 @@ TARGET_BOOTLOADER_BOARD_NAME := macallan
 TARGET_KERNEL_SOURCE := kernel/quanta/fg6q
 TARGET_KERNEL_CONFIG := fg6q_defconfig
 
-BOARD_KERNEL_CMDLINE  := 
+BOARD_KERNEL_CMDLINE  := androidboot.selinux=permissive
 BOARD_KERNEL_BASE     := 0x10000000
 BOARD_KERNEL_PAGESIZE := 2048
 
@@ -34,6 +35,12 @@ BOARD_USERDATAIMAGE_PARTITION_SIZE := 11320426496
 # Larger font in recovery
 BOARD_USE_CUSTOM_RECOVERY_FONT := \"roboto_23x41.h\"
 
+# Option "Go Back" in recovery menus
+BOARD_HAS_NO_SELECT_BUTTON := true
+
+# Used by envsetup.sh to build and install images
+RECOVERY_FSTAB_VERSION := 2
+
 # This is used to pick the appropriate boot animation size
 TARGET_SCREEN_WIDTH      := 2560
 TARGET_SCREEN_HEIGHT     := 1600
@@ -44,6 +51,12 @@ TARGET_SCREEN_DIMENSIONS := 2560x1600
 # is currently installed.
 TARGET_OTA_ASSERT_DEVICE := fg6q,FG6Q
 
+# HAL
+# Fixes error: dlopen failed: cannot locate symbol "_ZN7android18getPixelFormatInfoEiPNS_15PixelFormatInfoE" referenced by "hwcomposer.tegra.so"...
+BOARD_HAVE_PIXEL_FORMAT_INFO := true
+# Fixes error: dlopen failed: cannot locate symbol "_ZN7android10VectorImpl19reservedVectorImpl1Ev" referenced by "camera.tegra.so"...
+COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
+
 # WLAN
 WPA_SUPPLICANT_VERSION           := VER_0_8_X
 BOARD_WLAN_DEVICE                := bcmdhd
@@ -52,9 +65,13 @@ BOARD_HOSTAPD_DRIVER             := NL80211
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
 BOARD_HOSTAPD_PRIVATE_LIB        := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
 
+# Bluetooth
+BOARD_HAVE_BLUETOOTH        := true
+BOARD_HAVE_BLUETOOTH_BCM    := true
+BOARD_BLUEDROID_VENDOR_CONF := device/quanta/fg6q/files/bluetooth/vnd_fg6q.txt
+
 # Init
 PRODUCT_COPY_FILES += \
-    device/quanta/fg6q/files/init.rc:root/init.rc \
     device/quanta/fg6q/files/init.macallan.rc:root/init.macallan.rc \
     device/quanta/fg6q/files/init.model_specific.rc:root/init.model_specific.rc 
 
